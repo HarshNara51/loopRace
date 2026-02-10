@@ -3,8 +3,15 @@ using UnityEngine.Splines;
 
 public class TrafficSpawner : MonoBehaviour
 {
+    [System.Serializable]
+    public class TrafficLane
+    {
+        public SplineContainer spline;
+        public bool reverseDirection;
+    }
+
     public GameObject[] trafficPrefabs;
-    public SplineContainer[] lanes;
+    public TrafficLane[] lanes;
 
     public float spawnInterval = 2f;
     public float trafficSpeed = 12f;
@@ -24,18 +31,20 @@ public class TrafficSpawner : MonoBehaviour
 
     void SpawnTraffic()
     {
-        if (lanes.Length == 0 || trafficPrefabs.Length == 0) return;
+        if (trafficPrefabs.Length == 0 || lanes.Length == 0) return;
 
-        // Pick random lane
-        SplineContainer chosenLane = lanes[Random.Range(0, lanes.Length)];
+        GameObject prefab =
+            trafficPrefabs[Random.Range(0, trafficPrefabs.Length)];
 
-        // Pick random car
-        GameObject prefab = trafficPrefabs[Random.Range(0, trafficPrefabs.Length)];
+        TrafficLane lane =
+            lanes[Random.Range(0, lanes.Length)];
 
         GameObject car = Instantiate(prefab);
-        var follower = car.GetComponent<TrafficSplineFollower>();
+        TrafficSplineFollower follower =
+            car.GetComponent<TrafficSplineFollower>();
 
-        follower.spline = chosenLane;
+        follower.spline = lane.spline;
+        follower.reverseDirection = lane.reverseDirection;
         follower.speed = trafficSpeed;
     }
 }
